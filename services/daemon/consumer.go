@@ -2,20 +2,22 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"log"
 	"time"
-    "encoding/json"
 
 	"github.com/segmentio/kafka-go"
 )
 
 func StartConsumerLoop(brokers []string, db *DB) {
 	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers: brokers,
-		Topic:   "telemetry.raw",
-		GroupID: "aethernet-consumer-group",
-		MinBytes: 10e3, // 10KB
+		Brokers:  brokers,
+		Topic:    "telemetry.raw",
+		GroupID:  "aethernet-consumer-group",
+		MinBytes: 1,
 		MaxBytes: 10e6, // 10MB
+		MaxWait:  50 * time.Millisecond,
 	})
 
 	log.Println("Starting metrics consumer loop")
@@ -42,7 +44,7 @@ func StartConsumerLoop(brokers []string, db *DB) {
 			cancel()
 
 			if err != nil {
-				if err == context.DeadlineExceeded {
+				if errors.Is(err, context.DeadlineExceeded) {
 					continue
 				}
 				log.Printf("Error reading kafka message: %v", err)

@@ -1,37 +1,105 @@
 @import "tailwindcss";
 
 :root {
-  /* Industrial Cyber-Ops Theme */
-  --background: #020617; /* Slate 950 */
-  --foreground: #f8fafc; /* Slate 50 */
+  /* Ultra-Deep AMOLED Pitch Black Palette */
+  --background: #000000;
+  --foreground: #ffffff;
   
-  --primary: #22d3ee; /* Cyan 400 */
-  --primary-glow: rgba(34, 211, 238, 0.4);
+  --surface-primary: #000000;
+  --surface-secondary: #050505;
+  --surface-tertiary: #0a0a0a;
+
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(34, 211, 238, 0.3);
+
+  --primary: #00f5ff; /* Electric Cyan */
+  --primary-glow: rgba(0, 245, 255, 0.4);
   
-  --online: #10b981; /* Emerald 500 */
-  --warning: #f59e0b; /* Amber 500 */
-  --danger: #ef4444; /* Red 500 */
+  --reasoning: #c084fc; /* Neon Purple */
+  --reasoning-glow: rgba(192, 132, 252, 0.4);
+
+  --online: #10b981; /* Emerald */
+  --warning: #f59e0b; /* Amber */
+  --danger: #ef4444; /* Red */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
+  --color-reasoning: var(--reasoning);
   --color-online: var(--online);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
   
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: #000000;
+  color: #ffffff;
   font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
-/* Xterm overrides for dark theme */
+/* AMOLED Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #1e1e24;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #33333e;
+}
+
+/* Micro-Interaction: Lattice Wave Keyframes */
+@keyframes latticeWave {
+  0%, 100% {
+    opacity: 0.15;
+    transform: scale(0.85);
+    background-color: rgba(34, 211, 238, 0.2);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+    background-color: #00f5ff;
+    box-shadow: 0 0 8px rgba(0, 245, 255, 0.9);
+  }
+}
+
+/* Micro-Interaction: Jelly Radio Keyframes */
+@keyframes jellyBounce {
+  0% {
+    transform: scale(1, 1);
+  }
+  30% {
+    transform: scale(1.2, 0.85);
+  }
+  50% {
+    transform: scale(0.9, 1.15);
+  }
+  70% {
+    transform: scale(1.05, 0.95);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
+.animate-jelly {
+  animation: jellyBounce 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Xterm overrides for AMOLED black theme */
+.xterm,
+.xterm-screen,
 .xterm .xterm-viewport {
-  background-color: transparent !important;
+  background-color: #000000 !important;
 }

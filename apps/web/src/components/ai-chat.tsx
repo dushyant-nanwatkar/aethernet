@@ -90,29 +90,29 @@ export function AIChat() {
   ];
 
   return (
-    <div className="flex flex-col w-full h-full bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl backdrop-blur-sm">
+    <div className="flex flex-col w-full h-full bg-black border border-white/10 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.9)] backdrop-blur-xl">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-slate-950 border-b border-slate-800">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-black border-b border-white/10">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 bg-cyan-500/10 border border-cyan-500/30 rounded-lg text-cyan-400">
+          <div className="p-1.5 bg-black border border-cyan-400/30 rounded-lg text-cyan-400 shadow-[0_0_10px_rgba(0,245,255,0.2)]">
             <Bot size={18} />
           </div>
           <div>
-            <h3 className="text-xs font-bold font-mono text-slate-100 uppercase tracking-wider flex items-center gap-2">
-              AetherNet Local AI Assistant
+            <h3 className="text-xs font-bold font-mono text-white uppercase tracking-wider flex items-center gap-2">
+              AetherNet Diagnostic Bot
             </h3>
-            <p className="text-[10px] text-slate-400 font-mono">OFFLINE INFERENCE ENGINE</p>
+            <p className="text-[10px] text-zinc-500 font-mono">OFFLINE INFERENCE ENGINE</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400 bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800">
+        <div className="flex items-center gap-2 font-mono text-[11px] text-zinc-400 bg-black px-2.5 py-1 rounded-md border border-white/10">
           <ShieldCheck size={14} className="text-emerald-400" />
           <span className="text-emerald-400 font-bold">AIR-GAPPED</span>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-4 font-sans text-sm">
+      <div className="flex-1 p-4 overflow-y-auto flex flex-col gap-4 font-sans text-sm bg-black">
         {messages.map((msg) => (
           <div
             key={msg.id}

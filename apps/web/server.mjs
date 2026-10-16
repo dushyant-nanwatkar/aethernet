@@ -23,8 +23,24 @@ app.prepare().then(async () => {
     }
   });
 
-  // Attach WebSocket Server
-  const wss = new WebSocketServer({ server });
+  // Attach WebSocket Server with noServer: true to avoid intercepting Next.js internal HMR
+  const wss = new WebSocketServer({ noServer: true });
+
+  server.on('upgrade', (req, socket, head) => {
+    try {
+      const { pathname } = parse(req.url || '', true);
+      // Let Next.js handle its own HMR / internal upgrade requests
+      if (pathname && pathname.startsWith('/_next')) {
+        return;
+      }
+
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit('connection', ws, req);
+      });
+    } catch (err) {
+      socket.destroy();
+    }
+  });
 
   // Connect to Redis
   const subscriber = createClient({
@@ -42,11 +58,17 @@ app.prepare().then(async () => {
 
   wss.on('connection', (ws) => {
     console.log('✅ UI Client connected via WebSocket');
-    
-    ws.send(JSON.stringify({
-        type: 'log',
-        data: '\x1b[32m[SYSTEM]\x1b[0m Connected to AetherNet Node server.'
-    }));
+
+    ws.on('error', (err) => {
+      console.log('⚠️ WebSocket client connection notice:', err.message);
+    });
+
+    try {
+      ws.send(JSON.stringify({
+          type: 'log',
+          data: '\x1b[32m[SYSTEM]\x1b[0m Connected to AetherNet Node server.'
+      }));
+    } catch (e) {}
 
     ws.on('close', () => {
       console.log('❌ UI Client disconnected');
@@ -56,17 +78,21 @@ app.prepare().then(async () => {
   // Subscribe to stream and broadcast
   try {
       await subscriber.subscribe('metrics:stream', (message) => {
-        const payload = {
-            type: 'metrics',
-            data: JSON.parse(message)
-        };
-        const strPayload = JSON.stringify(payload);
-        
-        wss.clients.forEach((client) => {
-            if (client.readyState === 1) {
-                client.send(strPayload);
-            }
-        });
+        try {
+          const payload = {
+              type: 'metrics',
+              data: JSON.parse(message)
+          };
+          const strPayload = JSON.stringify(payload);
+          
+          wss.clients.forEach((client) => {
+              if (client.readyState === 1) { // WebSocket.OPEN
+                  try {
+                    client.send(strPayload);
+                  } catch (e) {}
+              }
+          });
+        } catch (e) {}
       });
   } catch (e) {
       console.error("Redis subscribe failed", e);

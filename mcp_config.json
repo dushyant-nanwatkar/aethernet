@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "aethernet-host": {
+      "command": "python3",
+      "args": [
+        "/home/dushyant/aethernet/services/mcp-server/server.py",
+        "--stdio"
+      ],
+      "env": {
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
+  }
+}

@@ -1,26 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-});
-
 export const metadata: Metadata = {
-  title: "AetherNet NOC",
-  description: "Autonomous telemetry and self-healing local AI workspace",
+  title: "AetherNet Studio | Air-Gapped AI & Autonomous Telemetry",
+  description: "Next-generation air-gapped AI reasoning studio and autonomous telemetry NOC workspace",
 };
 
 export default function RootLayout({
@@ -29,10 +12,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} antialiased min-h-screen bg-background text-foreground flex flex-col`}
-      >
+    <html lang="en" className="dark bg-black">
+      <body className="antialiased min-h-screen bg-black text-white flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200">
         {children}
       </body>
     </html>

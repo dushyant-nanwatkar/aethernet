@@ -7,7 +7,7 @@
 set -e
 
 # ANSI Color Codes
-CYAN='\030[0;36m'
+CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
@@ -76,6 +76,13 @@ check_port() {
     return 1
 }
 
+if check_port localhost 9092; then
+    echo -e "${GREEN}  ✓ Kafka (port 9092) is READY.${NC}"
+    docker exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --create --if-not-exists --topic telemetry.raw --partitions 1 --replication-factor 1 >/dev/null 2>&1 || true
+else
+    echo -e "${YELLOW}  ⚠️ Kafka on port 9092 is warming up...${NC}"
+fi
+
 if check_port localhost 6379; then
     echo -e "${GREEN}  ✓ Redis (port 6379) is READY.${NC}"
 else
@@ -97,13 +104,20 @@ fi
 if check_port localhost 1234; then
     echo -e "${GREEN}  ✓ LM Studio local server (port 1234) detected!${NC}"
 else
-    echo -e "${YELLOW}  ⚠️ LM Studio server (port 1234) not detected. (Ensure LM Studio local server is running if using LM Studio provider).${NC}"
+    echo -e "${YELLOW}  ⚠️ LM Studio server (port 1234) offline. Attempting auto-start via lms CLI...${NC}"
+    if [ -f "$HOME/.lmstudio/bin/lms" ]; then
+        "$HOME/.lmstudio/bin/lms" server start >/dev/null 2>&1 || true
+        sleep 2
+        if check_port localhost 1234; then
+            echo -e "${GREEN}  ✓ LM Studio server successfully started on port 1234!${NC}"
+        fi
+    fi
 fi
 
 # ------------------------------------------------------------------------------
 # 3. Launch Go Telemetry Daemon
 # ------------------------------------------------------------------------------
-echo -e "\n${BLUE}⚙️ [2/4] Starting Go Hardware Metrics Daemon...${NC}"
+echo -e "\n${BLUE}⚙️ [2/5] Starting Go Hardware Metrics Daemon...${NC}"
 if [ -d "services/daemon" ]; then
     (
         cd services/daemon
@@ -120,9 +134,24 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 4. Launch Python AI Orchestrator (FastAPI + LangGraph)
+# 4. Launch Safe MCP Host Server (Port 3005)
 # ------------------------------------------------------------------------------
-echo -e "\n${BLUE}🧠 [3/4] Starting Python AI Orchestrator...${NC}"
+echo -e "\n${BLUE}🛡️ [3/5] Starting AetherNet Safe MCP Host Server (Non-Root Enforced)...${NC}"
+if [ -d "services/mcp-server" ]; then
+    (
+        cd services/mcp-server
+        exec python3 server.py
+    ) &
+    PIDS+=($!)
+    echo -e "${GREEN}  ✓ MCP Host Server running on port 3005 (PID: ${PIDS[-1]})${NC}"
+else
+    echo -e "${RED}  ❌ Directory services/mcp-server missing!${NC}"
+fi
+
+# ------------------------------------------------------------------------------
+# 5. Launch Python AI Orchestrator (FastAPI + LangGraph)
+# ------------------------------------------------------------------------------
+echo -e "\n${BLUE}🧠 [4/5] Starting Python AI Orchestrator...${NC}"
 if [ -d "services/orchestrator" ]; then
     (
         cd services/orchestrator
@@ -138,9 +167,9 @@ else
 fi
 
 # ------------------------------------------------------------------------------
-# 5. Launch Next.js NOC UI & WebSocket Server
+# 6. Launch Next.js NOC UI & WebSocket Server
 # ------------------------------------------------------------------------------
-echo -e "\n${BLUE}🖥️ [4/4] Starting Next.js NOC Dashboard & Redis PubSub Server...${NC}"
+echo -e "\n${BLUE}🖥️ [5/5] Starting Next.js NOC Dashboard & Redis PubSub Server...${NC}"
 if [ -d "apps/web" ]; then
     (
         cd apps/web
